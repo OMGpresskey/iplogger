@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP Logger</title>
+</head>
+<body>
+    <h1>IP Logger</h1>
+    <p id="status">당신의 IP가 로그되고 있습니다...</p>
+    <script>
+        // 클라이언트 IP 주소를 가져오는 방법 (예제용, 실제 사용 시 IP 확인 방법을 조정해야 할 수 있음)
+        function getClientIp() {
+            return new Promise((resolve) => {
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => resolve(data.ip));
+            });
+        }
+
+        getClientIp().then(ip => {
+            // Node.js 서버에 IP 주소 전송
+            fetch('http://localhost:3001/log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ip: ip })
+            }).then(response => response.text())
+              .then(data => {
+                  console.log(data);
+                  document.getElementById('status').innerText = 'IP 주소가 성공적으로 로그되었습니다.';
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  document.getElementById('status').innerText = 'IP 주소 로그 실패';
+              });
+        });
+    </script>
+</body>
+</html>
